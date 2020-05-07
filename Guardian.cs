@@ -17,8 +17,7 @@ namespace RogueLegacy
 
         public bool CanAttack =>
             (AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval)
-            && Game.Player.Location.Y == Location.Y
-            && Math.Abs(Game.Player.Location.X - Location.X) == 1;
+            && CanAttackFromPoint(Location);
 
         public Look LookDirection { get; private set; }
 
@@ -55,7 +54,9 @@ namespace RogueLegacy
 
         public void Attack()
         {
-            Game.Player.GetDamage(Damage);
+            AttackTimer.Restart();
+            if (AttackTimer.IsRunning)
+                Game.Player.GetDamage(Damage);
         }
 
         public void GetDamage(int damage)
