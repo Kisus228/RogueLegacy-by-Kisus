@@ -14,8 +14,8 @@ namespace RogueLegacy
             Assert.IsTrue(PathFinder.GetShortestPath(Game.Enemies).Count() == expectedLength);
         }
 
-        [TestCase("DefaultMap", 10000)]
-        [Timeout(100)]
+        [TestCase("DefaultMap", 1000)]
+        [Timeout(200)]
         public void MonstersKillPlayer(string mapName, int monsterAttackInterval)
         {
             Game.CreateGame(mapName);

@@ -12,7 +12,7 @@ namespace RogueLegacy
         public static State[,] Map;
         public static Queue<Movement> MovementQueue;
         public static Player Player { get; private set; }
-        public static List<ICreature> Enemies { get; private set; }
+        public static List<IMonster> Enemies { get; private set; }
 
         public static readonly Dictionary<State, Brush> StateToColor = new Dictionary<State, Brush>
         {
@@ -34,7 +34,7 @@ namespace RogueLegacy
 
         public static void CreateGame(string mapName)
         {
-            Enemies = new List<ICreature>();
+            Enemies = new List<IMonster>();
             Map = InitializeMap(mapName);
             MovementQueue = new Queue<Movement>();
             UpdateMovements();

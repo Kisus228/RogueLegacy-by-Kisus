@@ -14,10 +14,10 @@ namespace RogueLegacy
         public int Armor { get; }
         public Point Location { get; private set; }
         public Stopwatch AttackTimer { get; }
-        public bool IsDead => HP <= 0;
+        public bool IsDead { get; private set; }
 
-        public bool CanAttack => true;
-        private bool IsBlocking { get; set; }
+        public bool CanAttack => AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval;
+        public bool IsBlocking { get; private set; }
         public Look LookDirection { get; private set; }
 
         public Player(Point startLocation)
@@ -27,29 +27,24 @@ namespace RogueLegacy
             Armor = 5;
             Location = startLocation;
             AttackTimer = new Stopwatch();
-        }
-
-        public bool CanAttackFromPoint(Point p)
-        {
-            return true;
+            AttackInterval = 700;
         }
 
         public void MakeMove(Point move)
         {
+            if (move == new Point(1, 0))
+                LookDirection = Look.Right;
+            else if (move == new Point(-1, 0))
+                LookDirection = Look.Left;
             var newLocation = Location + (Size) move;
             if (!Game.InBounds(Location + (Size)move) || Game.Map[newLocation.Y, newLocation.X] != State.Empty) return;
             Game.Map[Location.Y, Location.X] = State.Empty;
             Location = newLocation;
             Game.Map[Location.Y, Location.X] = State.Player;
-            if (move == new Point(1, 0))
-                LookDirection = Look.Right;
-            else if (move == new Point(-1, 0))
-                LookDirection = Look.Left;
         }
 
         public void Attack()
         {
-            if (AttackTimer.ElapsedMilliseconds != 0 && AttackTimer.ElapsedMilliseconds < AttackInterval) return;
             AttackTimer.Restart();
             var enemy = Game.Enemies.FirstOrDefault(x => x.Location == Location +
                                                          (Size) (LookDirection == Look.Right
@@ -60,14 +55,20 @@ namespace RogueLegacy
 
         public void GetDamage(int damage)
         {
-            if (IsBlocking)
-                return;
             HP -= (int) Math.Ceiling((1 - Armor / 100d) * damage);
+            if (HP > 0) return;
+            Game.Map[Location.Y, Location.X] = State.Empty;
+            IsDead = true;
         }
 
         public void ChangeAttackInterval(int newValue)
         {
             AttackInterval = newValue;
+        }
+
+        public void SwitchBlocking(bool value)
+        {
+            IsBlocking = value;
         }
     }
 }

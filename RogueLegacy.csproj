@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="DeltaPointsPathList.cs" />
     <Compile Include="Guardian.cs" />
+    <Compile Include="IMonster.cs" />
     <Compile Include="Look.cs" />
     <Compile Include="Movement.cs" />
     <Compile Include="PathFinder.cs" />
@@ -84,7 +85,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="States.cs" />
-    <Compile Include="SubscribeProvider.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

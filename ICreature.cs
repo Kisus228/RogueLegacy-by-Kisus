@@ -14,7 +14,6 @@ namespace RogueLegacy
         bool CanAttack { get; }
         Look LookDirection { get; }
 
-        bool CanAttackFromPoint(Point p);
         void MakeMove(Point move);
         void Attack();
         void GetDamage(int damage);

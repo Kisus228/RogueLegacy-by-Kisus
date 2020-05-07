@@ -6,7 +6,7 @@ namespace RogueLegacy
 {
     public static class PathFinder
     {
-        public static IEnumerable<Movement> GetShortestPath(List<ICreature> creatures)
+        public static IEnumerable<Movement> GetShortestPath(List<IMonster> creatures)
         {
             var queue = new Queue<DeltaPointsPath>();
             var visited = new Dictionary<ICreature, HashSet<Point>>();
@@ -40,7 +40,7 @@ namespace RogueLegacy
             }
         }
 
-        private static void InitializeStartLocation(List<ICreature> creatures, Queue<DeltaPointsPath> queue,
+        private static void InitializeStartLocation(List<IMonster> creatures, Queue<DeltaPointsPath> queue,
             Dictionary<ICreature, HashSet<Point>> visited)
         {
             foreach (var enemy in creatures)

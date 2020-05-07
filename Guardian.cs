@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace RogueLegacy
 {
-    internal class Guardian : ICreature
+    internal class Guardian : ICreature, IMonster
     {
         private int AttackInterval { get; set; }
         public Stopwatch AttackTimer { get; }
@@ -13,7 +13,7 @@ namespace RogueLegacy
         public int Damage { get; }
         public int Armor { get; }
         public Point Location { get; private set; }
-        public bool IsDead => HP <= 0;
+        public bool IsDead { get; private set; }
 
         public bool CanAttack =>
             (AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval)
@@ -29,7 +29,7 @@ namespace RogueLegacy
             Armor = 20;
             Location = startLocation;
             LookDirection = Look.Right;
-            AttackInterval = 1000;
+            AttackInterval = 700;
         }
 
         public bool CanAttackFromPoint(Point p)
@@ -40,28 +40,32 @@ namespace RogueLegacy
 
         public void MakeMove(Point move)
         {
+            var relativeX = Game.Player.Location.X -  Location.X;
+            if (relativeX > 0)
+                LookDirection = Look.Right;
+            else if (relativeX < 0)
+                LookDirection = Look.Left;
             var newLocation = Location + (Size) move;
             if (!Game.InBounds(Location + (Size)move) || Game.Map[newLocation.Y, newLocation.X] != State.Empty) return;
             Game.Map[Location.Y, Location.X] = State.Empty;
             Location = newLocation;
             Game.Map[Location.Y, Location.X] = State.Enemy;
-            var relativePlayerPosition = Game.Player.Location - (Size) Location;
-            if (relativePlayerPosition.X > 0)
-                LookDirection = Look.Right;
-            else if (relativePlayerPosition.X < 0)
-                LookDirection = Look.Left;
         }
 
         public void Attack()
         {
             AttackTimer.Restart();
-            if (AttackTimer.IsRunning)
-                Game.Player.GetDamage(Damage);
+            if (Game.Player.IsBlocking && Game.Player.LookDirection != LookDirection) return;
+            Game.Player.GetDamage(Damage);
         }
 
         public void GetDamage(int damage)
         {
             HP -= (int) Math.Ceiling((1 - Armor / 100d) * damage);
+            if (HP > 0) return;
+            IsDead = true;
+            Game.Enemies.Remove(this);
+            Game.Map[Location.Y, Location.X] = State.Empty;
         }
 
         public void ChangeAttackInterval(int newValue)
