@@ -42,7 +42,7 @@ namespace RogueLegacy
 
         public static void UpdateMovements()
         {
-            foreach (var move in PathFinder.GetShortestPath(Enemies)) MovementQueue.Enqueue(move);
+            foreach (var move in PathFinder.GetShortestPath(Enemies).Where(x => x.Creature.CanMove(x.DeltaPoint))) MovementQueue.Enqueue(move);
         }
 
         private static State[,] InitializeMap(string mapName)

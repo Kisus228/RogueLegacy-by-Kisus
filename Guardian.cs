@@ -32,14 +32,14 @@ namespace RogueLegacy
             Location = startLocation;
             LookDirection = Look.Right;
             AttackInterval = 700;
-            MoveInterval = 500;
+            MoveInterval = 1000;
             MoveTimer = new Stopwatch();
         }
 
         public void MakeMove(Point move)
         {
-            var newLocation = Location + (Size) move;
             MoveTimer.Restart();
+            var newLocation = Location + (Size) move;
             Game.Map[Location.Y, Location.X] = State.Empty;
             Location = newLocation;
             Game.Map[Location.Y, Location.X] = State.Enemy;
@@ -66,10 +66,10 @@ namespace RogueLegacy
             AttackInterval = newValue;
         }
 
-        bool ICreature.CanMove(Point move)
+        public bool CanMove(Point move)
         {
             var newLocation = Location + (Size) move;
-            return (AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= MoveInterval)
+            return (MoveTimer.ElapsedMilliseconds == 0 || MoveTimer.ElapsedMilliseconds >= MoveInterval)
                    && Game.InBounds(Location + (Size) move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
         }
 
