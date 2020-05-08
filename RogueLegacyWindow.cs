@@ -81,7 +81,7 @@ namespace RogueLegacy
         {
             timer.Tick += (sender, args) =>
             {
-                if (Game.Player.IsDead) return;
+                if (Game.Player.IsDead || Game.Enemies.All(x => x.IsDead)) return;
                 if (Game.MovementQueue.Count == 0)
                     Game.UpdateMovements();
                 if (Game.MovementQueue.Count != 0)
