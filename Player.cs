@@ -16,9 +16,11 @@ namespace RogueLegacy
         public Stopwatch AttackTimer { get; }
         public bool IsDead { get; private set; }
 
-        public bool CanAttack => AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval;
+        public bool CanAttack =>
+            AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval;
+
         public bool IsBlocking { get; private set; }
-        public Look LookDirection { get; private set; }
+        public Look LookDirection { get; set; }
 
         public Player(Point startLocation)
         {
@@ -32,12 +34,7 @@ namespace RogueLegacy
 
         public void MakeMove(Point move)
         {
-            if (move == new Point(1, 0))
-                LookDirection = Look.Right;
-            else if (move == new Point(-1, 0))
-                LookDirection = Look.Left;
             var newLocation = Location + (Size) move;
-            if (!Game.InBounds(Location + (Size)move) || Game.Map[newLocation.Y, newLocation.X] != State.Empty) return;
             Game.Map[Location.Y, Location.X] = State.Empty;
             Location = newLocation;
             Game.Map[Location.Y, Location.X] = State.Player;
@@ -64,6 +61,12 @@ namespace RogueLegacy
         public void ChangeAttackInterval(int newValue)
         {
             AttackInterval = newValue;
+        }
+
+        public bool CanMove(Point move)
+        {
+            var newLocation = Location + (Size) move;
+            return Game.InBounds(Location + (Size) move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
         }
 
         public void SwitchBlocking(bool value)

@@ -50,9 +50,11 @@ namespace RogueLegacy
                     Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(0, 1)));
                     break;
                 case Keys.Left:
+                    Game.Player.LookDirection = Look.Left;
                     Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(-1, 0)));
                     break;
                 case Keys.Right:
+                    Game.Player.LookDirection = Look.Right;
                     Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(1, 0)));
                     break;
                 case Keys.D:
@@ -86,7 +88,10 @@ namespace RogueLegacy
                 {
                     var movement = Game.MovementQueue.Dequeue();
                     var creature = movement.Creature;
-                    creature.MakeMove(movement.DeltaPoint);
+                    if (creature is IMonster monster)
+                        monster.SetLookDirectionToPlayer();
+                    if (creature.CanMove(movement.DeltaPoint))
+                        creature.MakeMove(movement.DeltaPoint);
                 }
 
                 foreach (var creature in Game.Enemies.Where(creature => creature.CanAttack))

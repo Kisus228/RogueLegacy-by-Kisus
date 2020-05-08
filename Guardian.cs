@@ -20,6 +20,8 @@ namespace RogueLegacy
             && CanAttackFromPoint(Location);
 
         public Look LookDirection { get; private set; }
+        public Stopwatch MoveTimer { get; }
+        public int MoveInterval { get; }
 
         public Guardian(Point startLocation)
         {
@@ -30,23 +32,14 @@ namespace RogueLegacy
             Location = startLocation;
             LookDirection = Look.Right;
             AttackInterval = 700;
-        }
-
-        public bool CanAttackFromPoint(Point p)
-        {
-            return Game.Player.Location.Y == p.Y
-                   && Math.Abs(Game.Player.Location.X - p.X) == 1;
+            MoveInterval = 500;
+            MoveTimer = new Stopwatch();
         }
 
         public void MakeMove(Point move)
         {
-            var relativeX = Game.Player.Location.X -  Location.X;
-            if (relativeX > 0)
-                LookDirection = Look.Right;
-            else if (relativeX < 0)
-                LookDirection = Look.Left;
             var newLocation = Location + (Size) move;
-            if (!Game.InBounds(Location + (Size)move) || Game.Map[newLocation.Y, newLocation.X] != State.Empty) return;
+            MoveTimer.Restart();
             Game.Map[Location.Y, Location.X] = State.Empty;
             Location = newLocation;
             Game.Map[Location.Y, Location.X] = State.Enemy;
@@ -71,6 +64,28 @@ namespace RogueLegacy
         public void ChangeAttackInterval(int newValue)
         {
             AttackInterval = newValue;
+        }
+
+        bool ICreature.CanMove(Point move)
+        {
+            var newLocation = Location + (Size) move;
+            return (AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= MoveInterval)
+                   && Game.InBounds(Location + (Size) move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
+        }
+
+        public bool CanAttackFromPoint(Point p)
+        {
+            return Game.Player.Location.Y == p.Y
+                   && Math.Abs(Game.Player.Location.X - p.X) == 1;
+        }
+
+        public void SetLookDirectionToPlayer()
+        {
+            var relativeX = Game.Player.Location.X - Location.X;
+            if (relativeX > 0)
+                LookDirection = Look.Right;
+            else if (relativeX < 0)
+                LookDirection = Look.Left;
         }
     }
 }

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RogueLegacy
 {
     public interface IMonster : ICreature
     {
+        Stopwatch MoveTimer { get; }
+        int MoveInterval { get; }
         bool CanAttackFromPoint(Point p);
+        void SetLookDirectionToPlayer();
     }
 }
