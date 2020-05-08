@@ -15,12 +15,15 @@ namespace RogueLegacy
 {
     public sealed class RogueLegacyWindow : Form
     {
+        private Label pauseLabel;
         private readonly Timer timer = new Timer{Interval = 15};
+        private bool IsPausing { get; set; }
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
             ClientSize = new Size(Game.Map.GetLength(0) * Game.ElementSize, Game.Map.GetLength(1) * Game.ElementSize);
             MaximizeBox = false;
+            InitializeComponents();
             StartTimer();
             //InitializeMediaPlayer();
         }
@@ -40,29 +43,40 @@ namespace RogueLegacy
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (Game.Player.IsBlocking) return;
+            if (!Game.Player.IsBlocking && !IsPausing)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Up:
+                        Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(0, -1)));
+                        break;
+                    case Keys.Down:
+                        Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(0, 1)));
+                        break;
+                    case Keys.Left:
+                        Game.Player.LookDirection = Look.Left;
+                        Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(-1, 0)));
+                        break;
+                    case Keys.Right:
+                        Game.Player.LookDirection = Look.Right;
+                        Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(1, 0)));
+                        break;
+                    case Keys.D:
+                        if (Game.Player.CanAttack)
+                            Game.Player.Attack();
+                        break;
+                    case Keys.Space:
+                        Game.Player.SwitchBlocking(true);
+                        break;
+                }
+            }
+
             switch (e.KeyCode)
             {
-                case Keys.Up:
-                    Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(0, -1)));
-                    break;
-                case Keys.Down:
-                    Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(0, 1)));
-                    break;
-                case Keys.Left:
-                    Game.Player.LookDirection = Look.Left;
-                    Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(-1, 0)));
-                    break;
-                case Keys.Right:
-                    Game.Player.LookDirection = Look.Right;
-                    Game.MovementQueue.Enqueue(new Movement(Game.Player, new Point(1, 0)));
-                    break;
-                case Keys.D:
-                    if (Game.Player.CanAttack)
-                        Game.Player.Attack();
-                    break;
-                case Keys.Space:
-                    Game.Player.SwitchBlocking(true);
+                case Keys.Escape:
+                    IsPausing = !IsPausing;
+                    pauseLabel.Visible = !pauseLabel.Visible;
+                    Invalidate();
                     break;
             }
         }
@@ -81,7 +95,7 @@ namespace RogueLegacy
         {
             timer.Tick += (sender, args) =>
             {
-                if (Game.Player.IsDead || Game.Enemies.All(x => x.IsDead)) return;
+                if (Game.Player.IsDead || Game.Enemies.All(x => x.IsDead) || IsPausing) return;
                 if (Game.MovementQueue.Count == 0)
                     Game.UpdateMovements();
                 if (Game.MovementQueue.Count != 0)
@@ -110,6 +124,17 @@ namespace RogueLegacy
                 sp.PlayLooping();
             };
             Closing += (sender, args) => sp.Dispose();
+        }
+
+        private void InitializeComponents()
+        {
+            pauseLabel = new System.Windows.Forms.Label();
+            pauseLabel.AutoSize = true;
+            pauseLabel.Location = new System.Drawing.Point(133, 114);
+            pauseLabel.Name = "pauseLabel";
+            pauseLabel.Size = new System.Drawing.Size(35, 13);
+            pauseLabel.Text = "PAUSE";
+            pauseLabel.Visible = false;
         }
     }
 }
