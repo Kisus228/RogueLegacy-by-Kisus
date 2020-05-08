@@ -7,6 +7,7 @@ namespace RogueLegacy
     {
         Stopwatch MoveTimer { get; }
         int MoveInterval { get; }
+        int Range { get; }
         bool CanAttackFromPoint(Point p);
         void SetLookDirectionToPlayer();
     }

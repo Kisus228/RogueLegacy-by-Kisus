@@ -22,6 +22,7 @@ namespace RogueLegacy
         public Look LookDirection { get; private set; }
         public Stopwatch MoveTimer { get; }
         public int MoveInterval { get; }
+        public int Range { get; }
 
         public Guardian(Point startLocation)
         {
@@ -32,8 +33,9 @@ namespace RogueLegacy
             Location = startLocation;
             LookDirection = Look.Right;
             AttackInterval = 700;
-            MoveInterval = 1000;
             MoveTimer = new Stopwatch();
+            MoveInterval = 1000;
+            Range = 3;
         }
 
         public void MakeMove(Point move)

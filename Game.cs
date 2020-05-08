@@ -11,8 +11,6 @@ namespace RogueLegacy
         public const int ElementSize = 32;
         public static State[,] Map;
         public static Queue<Movement> MovementQueue;
-        public static Player Player { get; private set; }
-        public static List<IMonster> Enemies { get; private set; }
 
         public static readonly Dictionary<State, Brush> StateToColor = new Dictionary<State, Brush>
         {
@@ -22,6 +20,9 @@ namespace RogueLegacy
             {State.UnderAttack, Brushes.Orange},
             {State.Attacked, Brushes.Red}
         };
+
+        public static Player Player { get; private set; }
+        public static List<IMonster> Enemies { get; private set; }
 
         private static int MapHeight => Map.GetLength(0);
         private static int MapWidth => Map.GetLength(1);
@@ -42,14 +43,21 @@ namespace RogueLegacy
 
         public static void UpdateMovements()
         {
-            foreach (var move in PathFinder.GetShortestPath(Enemies).Where(x => x.Creature.CanMove(x.DeltaPoint))) MovementQueue.Enqueue(move);
+            foreach (var move in PathFinder.GetShortestPath(Enemies.Where(x =>
+                    {
+                        var distance = Player.Location - (Size) x.Location;
+                        return Math.Abs(distance.X) <= x.Range && Math.Abs(distance.Y) <= x.Range;
+                    })
+                    .ToList())
+                .Where(x => x.Creature.CanMove(x.DeltaPoint)))
+                MovementQueue.Enqueue(move);
         }
 
         private static State[,] InitializeMap(string mapName)
         {
             var level = GetMapsFromText()
                 .First(name => name.StartsWith(mapName))
-                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries)
                 .Skip(1)
                 .ToArray();
             var result = new State[level.Length, level[0].Length];
