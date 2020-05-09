@@ -19,11 +19,12 @@ namespace RogueLegacy
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
         public static string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
+        private MenuStrip menuStrip1;
         public static string ProjectPath = Directory.GetParent(ExeFilePath).Parent.Parent.FullName;
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
-            ClientSize = new Size(Game.Map.GetLength(0) * Game.ElementSize, Game.Map.GetLength(1) * Game.ElementSize);
+            ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize, (Game.Map.GetLength(0) + 1) * Game.ElementSize);
             MaximizeBox = false;
             InitializeComponents();
             StartTimer();
@@ -33,6 +34,7 @@ namespace RogueLegacy
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
+            g.TranslateTransform(0, Game.ElementSize);
             g.FillRectangle(Brushes.LightSlateGray, 0, 0, Game.Map.GetLength(1) * Game.ElementSize,
                 Game.Map.GetLength(0) * Game.ElementSize);
             for (var y = 0; y < Game.Map.GetLength(0); y++)
@@ -54,6 +56,7 @@ namespace RogueLegacy
                         Game.ElementSize, Game.ElementSize);
                 }
             }
+            g.ResetTransform();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -133,7 +136,7 @@ namespace RogueLegacy
             SoundPlayer sp = null;
             Shown += (sender, args) =>
             {
-                sp = new SoundPlayer(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"backsound.wav"));
+                sp = new SoundPlayer(Path.Combine(ProjectPath, @"backsound.wav"));
                 sp.PlayLooping();
             };
             Closing += (sender, args) => sp.Dispose();
@@ -141,11 +144,35 @@ namespace RogueLegacy
 
         private void InitializeComponents()
         {
-            pauseLabel = new System.Windows.Forms.Label();
+            InitializePauseLabel();
+            InitializeMenuStrip();
+            PerformLayout();
+        }
+
+        private void InitializeMenuStrip()
+        {
+            var menuStrip = new MenuStrip
+                {Location = Point.Empty, Size = new Size(Game.Map.GetLength(1) * Game.ElementSize, Game.ElementSize)};
+            Controls.Add(menuStrip);
+            MainMenuStrip = menuStrip;
+            var menuItem = new ToolStripMenuItem("Выбрать уровень");
+            foreach (var level in Game.Levels)
+            {
+                menuItem.DropDownItems.Add(level
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .First());
+            }
+
+            menuStrip.Items.Add(menuItem);
+        }
+
+        private void InitializePauseLabel()
+        {
+            pauseLabel = new Label();
             pauseLabel.AutoSize = true;
-            pauseLabel.Location = new System.Drawing.Point(133, 114);
+            pauseLabel.Location = new System.Drawing.Point(0, (Game.Map.GetLength(0) - 2) * Game.ElementSize);
             pauseLabel.Name = "pauseLabel";
-            pauseLabel.Size = new System.Drawing.Size(35, 13);
+            pauseLabel.Size = new System.Drawing.Size(Game.Map.GetLength(1) * Game.ElementSize, Game.ElementSize * 4);
             pauseLabel.Text = "PAUSE";
             pauseLabel.Visible = false;
         }

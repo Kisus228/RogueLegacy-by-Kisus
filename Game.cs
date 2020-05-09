@@ -11,6 +11,7 @@ namespace RogueLegacy
         public const int ElementSize = 32;
         public static State[,] Map;
         public static Queue<Movement> MovementQueue;
+        public static readonly IEnumerable<string> Levels = GetMapsFromText();
 
         public static readonly Dictionary<State, Brush> StateToColor = new Dictionary<State, Brush>
         {
@@ -72,7 +73,7 @@ namespace RogueLegacy
 
         private static State[,] InitializeMap(string mapName)
         {
-            var level = GetMapsFromText()
+            var level = Levels
                 .First(name => name.StartsWith(mapName))
                 .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries)
                 .Skip(1)
@@ -104,8 +105,7 @@ namespace RogueLegacy
 
         private static IEnumerable<string> GetMapsFromText()
         {
-            var exeFile = AppDomain.CurrentDomain.BaseDirectory;
-            return File.ReadAllText(Path.Combine(exeFile, @"Maps.txt")).Split('|');
+            return File.ReadAllText(Path.Combine(RogueLegacyWindow.ProjectPath, @"Maps.txt")).Split('|');
         }
     }
 }
