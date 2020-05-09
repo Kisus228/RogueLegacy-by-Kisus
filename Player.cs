@@ -52,10 +52,18 @@ namespace RogueLegacy
 
         public void GetDamage(int damage)
         {
-            HP -= (int) Math.Ceiling((1 - Armor / 100d) * damage);
-            if (HP > 0) return;
-            Game.Map[Location.Y, Location.X] = State.Empty;
-            IsDead = true;
+            HP -= (int)Math.Ceiling((1 - Armor / 100d) * damage);
+            if (HP > 0)
+            {
+                var recoil = LookDirection == Look.Right ? new Point(-1, 0) : new Point(1, 0);
+                if (CanMove(recoil))
+                    MakeMove(recoil);
+            }
+            else
+            {
+                IsDead = true;
+                Game.Map[Location.Y, Location.X] = State.Empty;
+            }
         }
 
         public void ChangeAttackInterval(int newValue)

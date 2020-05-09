@@ -19,7 +19,8 @@ namespace RogueLegacy
     public sealed class RogueLegacyWindow : Form
     {
         private Label pauseLabel;
-        private ProgressBar progressBar;
+        private ProgressBar monsterHpProgressBar;
+        private ProgressBar PlayerHpProgressBar;
         private SoundPlayer sp;
         private bool isSoundPlayerRunning;
         private readonly Timer timer = new Timer{Interval = 15};
@@ -29,7 +30,7 @@ namespace RogueLegacy
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
-            ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize, (Game.Map.GetLength(0) + 2) * Game.ElementSize);
+            ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize, (Game.Map.GetLength(0) + 3) * Game.ElementSize);
             MaximizeBox = false;
             InitializeComponents();
             StartTimer();
@@ -116,6 +117,7 @@ namespace RogueLegacy
         {
             timer.Tick += (sender, args) =>
             {
+                Invalidate();
                 if (Game.Player.IsDead || Game.Enemies.All(x => x.IsDead) || IsPausing) return;
                 if (Game.MovementQueue.Count == 0)
                     Game.UpdateMovements();
@@ -137,8 +139,8 @@ namespace RogueLegacy
                     // ignored
                 }
 
-                progressBar.Value = progressBar.Maximum - Game.Enemies.Where(x => !(x is Skeleton)).Sum(x => x.HP);
-                Invalidate();
+                monsterHpProgressBar.Value = monsterHpProgressBar.Maximum - Game.Enemies.Where(x => !(x is Skeleton)).Sum(x => x.HP);
+                PlayerHpProgressBar.Value = Game.Player.HP;
             };
             timer.Start();
         }
@@ -158,22 +160,38 @@ namespace RogueLegacy
         {
             InitializePauseLabel();
             InitializeMenuStrip();
-            InitializeProgressBar();
+            InitializeProgressBars();
             InitializeMediaPlayer();
             PerformLayout();
         }
 
-        private void InitializeProgressBar()
+        private void InitializeProgressBars()
         {
-            progressBar = new ProgressBar
+            var table = new TableLayoutPanel
             {
-                Location = new Point(0, (Game.Map.GetLength(0) + 1) * Game.ElementSize),
-                Height = Game.ElementSize,
-                Dock = DockStyle.Bottom,
-                Maximum = Game.Enemies.Sum(enemy => enemy.HP),
-                ForeColor = Color.Red
+                Location = new Point(0, (Game.MapHeight + 1) * Game.ElementSize),
+                Height = Game.ElementSize * 2,
+                RowStyles = { new RowStyle(SizeType.Percent, 50) },
+                Dock = DockStyle.Bottom
             };
-            Controls.Add(progressBar);
+
+            monsterHpProgressBar = new ProgressBar
+            {
+                Maximum = Game.Enemies.Sum(enemy => enemy.HP),
+                ForeColor = Color.Red,
+                Dock = DockStyle.Fill
+            };
+
+            PlayerHpProgressBar = new ProgressBar
+            {
+                Maximum = Game.Player.HP,
+                ForeColor = Color.Lime,
+                Dock = DockStyle.Fill
+            };
+            table.Controls.Add(monsterHpProgressBar);
+            table.Controls.Add(PlayerHpProgressBar);
+
+            Controls.Add(table);
         }
 
         private void InitializeMenuStrip()
@@ -195,8 +213,8 @@ namespace RogueLegacy
                 Game.LoadLevel(args.ClickedItem.Text);
                 ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize,
                     (Game.Map.GetLength(0) + 2) * Game.ElementSize);
-                progressBar.Maximum = Game.Enemies.Sum(x => x.HP);
-                progressBar.Value = 0;
+                monsterHpProgressBar.Maximum = Game.Enemies.Sum(x => x.HP);
+                monsterHpProgressBar.Value = 0;
                 timer.Start();
             };
 
