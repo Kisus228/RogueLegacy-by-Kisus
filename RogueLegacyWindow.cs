@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Media;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using Timer = System.Windows.Forms.Timer;
 
 namespace RogueLegacy
 {
@@ -18,9 +20,9 @@ namespace RogueLegacy
         private Label pauseLabel;
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
-        public static string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
-        private MenuStrip menuStrip1;
-        public static string ProjectPath = Directory.GetParent(ExeFilePath).Parent.Parent.FullName;
+        private static readonly string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
+        private Label label1;
+        public static readonly string ProjectPath = Directory.GetParent(ExeFilePath).Parent.Parent.FullName;
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
@@ -94,7 +96,6 @@ namespace RogueLegacy
                 case Keys.Escape:
                     IsPausing = !IsPausing;
                     pauseLabel.Visible = !pauseLabel.Visible;
-                    Invalidate();
                     break;
             }
         }
@@ -168,13 +169,17 @@ namespace RogueLegacy
 
         private void InitializePauseLabel()
         {
-            pauseLabel = new Label();
-            pauseLabel.AutoSize = true;
-            pauseLabel.Location = new System.Drawing.Point(0, (Game.Map.GetLength(0) - 2) * Game.ElementSize);
-            pauseLabel.Name = "pauseLabel";
-            pauseLabel.Size = new System.Drawing.Size(Game.Map.GetLength(1) * Game.ElementSize, Game.ElementSize * 4);
-            pauseLabel.Text = "PAUSE";
-            pauseLabel.Visible = false;
+            pauseLabel = new Label
+            {
+                AutoSize = true,
+                Location = new System.Drawing.Point((Game.Map.GetLength(1) / 2 - 1) * Game.ElementSize, (Game.Map.GetLength(0) / 2) * Game.ElementSize),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Name = "pauseLabel",
+                Size = new System.Drawing.Size(Game.Map.GetLength(1) * Game.ElementSize, Game.ElementSize * 4),
+                Text = "PAUSE",
+                Visible = false
+            };
+            Controls.Add(pauseLabel);
         }
     }
 }
