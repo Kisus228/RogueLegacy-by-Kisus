@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace RogueLegacy
 {
-    internal class Guardian : ICreature, IMonster
+    internal class Guardian : IMonster
     {
         private int AttackInterval { get; set; }
         public Stopwatch AttackTimer { get; }
@@ -49,6 +49,7 @@ namespace RogueLegacy
 
         public void Attack()
         {
+            SetLookDirectionToPlayer();
             AttackTimer.Restart();
             if (Game.Player.IsBlocking && Game.Player.LookDirection != LookDirection) return;
             Game.Player.GetDamage(Damage);
@@ -73,6 +74,11 @@ namespace RogueLegacy
             var newLocation = Location + (Size) move;
             return (MoveTimer.ElapsedMilliseconds == 0 || MoveTimer.ElapsedMilliseconds >= MoveInterval)
                    && Game.InBounds(Location + (Size) move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
+        }
+
+        public string GetName()
+        {
+            return "guardian";
         }
 
         public bool CanAttackFromPoint(Point p)

@@ -69,6 +69,11 @@ namespace RogueLegacy
             return Game.InBounds(Location + (Size) move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
         }
 
+        public string GetName()
+        {
+            return "player";
+        }
+
         public void SwitchBlocking(bool value)
         {
             IsBlocking = value;

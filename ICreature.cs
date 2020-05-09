@@ -19,5 +19,6 @@ namespace RogueLegacy
         void GetDamage(int damage);
         void ChangeAttackInterval(int newValue);
         bool CanMove(Point move);
+        string GetName();
     }
 }

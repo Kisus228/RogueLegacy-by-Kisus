@@ -18,6 +18,8 @@ namespace RogueLegacy
         private Label pauseLabel;
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
+        public static string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
+        public static string ProjectPath = Directory.GetParent(ExeFilePath).Parent.Parent.FullName;
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
@@ -31,11 +33,24 @@ namespace RogueLegacy
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
+            g.FillRectangle(Brushes.LightSlateGray, 0, 0, Game.Map.GetLength(1) * Game.ElementSize,
+                Game.Map.GetLength(0) * Game.ElementSize);
             for (var y = 0; y < Game.Map.GetLength(0); y++)
             {
                 for (var x = 0; x < Game.Map.GetLength(1); x++)
                 {
-                    g.FillRectangle(Game.StateToColor[Game.Map[y, x]], x * Game.ElementSize, y * Game.ElementSize,
+                    if (Game.Map[y, x] == State.Player || Game.Map[y, x] == State.Enemy)
+                    {
+                        var creature = Game.Player.Location == new Point(x, y)
+                            ? Game.Player
+                            : (ICreature) Game.Enemies.FirstOrDefault(enemy => enemy.Location == new Point(x, y));
+                        var pic = (Bitmap)Game.CreatureToPicture[creature.GetName()].Clone();
+                        if (creature.LookDirection == Look.Left)
+                            pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                        g.DrawImage(pic, x * Game.ElementSize, y * Game.ElementSize);
+                    }
+                    else if (Game.Map[y, x] != State.Empty)
+                        g.FillRectangle(Game.StateToColor[Game.Map[y, x]], x * Game.ElementSize, y * Game.ElementSize,
                         Game.ElementSize, Game.ElementSize);
                 }
             }

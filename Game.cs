@@ -14,12 +14,12 @@ namespace RogueLegacy
 
         public static readonly Dictionary<State, Brush> StateToColor = new Dictionary<State, Brush>
         {
-            {State.Empty, Brushes.Black},
-            {State.Player, Brushes.Green},
-            {State.Enemy, Brushes.DarkOrchid},
+            {State.Empty, Brushes.LightSlateGray},
             {State.UnderAttack, Brushes.Orange},
-            {State.Attacked, Brushes.Red}
+            {State.Attacked, Brushes.Red},
         };
+
+        public static readonly Dictionary<string, Bitmap> CreatureToPicture = new Dictionary<string, Bitmap>();
 
         public static Player Player { get; private set; }
         public static List<IMonster> Enemies { get; private set; }
@@ -35,6 +35,8 @@ namespace RogueLegacy
 
         public static void CreateGame(string mapName)
         {
+            CreatureToPicture.Add("player", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "player.bmp")));
+            CreatureToPicture.Add("guardian", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "guardian.bmp")));
             Enemies = new List<IMonster>();
             Map = InitializeMap(mapName);
             MovementQueue = new Queue<Movement>();
