@@ -49,6 +49,8 @@ namespace RogueLegacy
                 new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "guardian.bmp")));
             CreatureToPicture.Add("skeleton",
                 new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "skeleton.bmp")));
+            CreatureToPicture.Add("necromancer",
+                new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "necromancer.bmp")));
         }
 
         public static void UpdateMovements()
@@ -87,6 +89,10 @@ namespace RogueLegacy
                     case 'P':
                         result[row, column] = State.Player;
                         Player = new Player(new Point(column, row));
+                        break;
+                    case 'N':
+                        result[row, column] = State.Enemy;
+                        Enemies.Add(new Necromancer(new Point(column, row)));
                         break;
                     default:
                         result[row, column] = State.Empty;
