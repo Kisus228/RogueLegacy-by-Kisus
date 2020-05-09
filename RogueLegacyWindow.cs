@@ -117,8 +117,6 @@ namespace RogueLegacy
                 {
                     var movement = Game.MovementQueue.Dequeue();
                     var creature = movement.Creature;
-                    if (creature is IMonster monster)
-                        monster.SetLookDirectionToPlayer();
                     if (creature.CanMove(movement.DeltaPoint))
                         creature.MakeMove(movement.DeltaPoint);
                 }

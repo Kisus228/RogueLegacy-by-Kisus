@@ -53,6 +53,11 @@ namespace RogueLegacy
                     .ToList())
                 .Where(x => x.Creature.CanMove(x.DeltaPoint)))
                 MovementQueue.Enqueue(move);
+            foreach (var monster in Enemies.Where(x => x is Necromancer))
+            {
+                var necromancer = (Necromancer) monster;
+                MovementQueue.Enqueue(new Movement(necromancer, necromancer.GetNewRandomPoint()));
+            }
         }
 
         private static State[,] InitializeMap(string mapName)
