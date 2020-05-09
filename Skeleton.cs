@@ -32,7 +32,7 @@ namespace RogueLegacy
             AttackInterval = 400;
             MoveTimer = new Stopwatch();
             MoveInterval = 700;
-            Range = 3;
+            Range = 2;
         }
         public void MakeMove(Point move)
         {
