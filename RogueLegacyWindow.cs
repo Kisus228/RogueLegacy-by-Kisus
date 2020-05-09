@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Media;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Channels;
 using System.Threading;
 using Timer = System.Windows.Forms.Timer;
 
@@ -18,9 +19,9 @@ namespace RogueLegacy
     public sealed class RogueLegacyWindow : Form
     {
         private Label pauseLabel;
-        private ProgressBar ProgressBar;
-        private SoundPlayer Sp;
-        private bool IsSoundPlayerRunning;
+        private ProgressBar progressBar;
+        private SoundPlayer sp;
+        private bool isSoundPlayerRunning;
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
         private static readonly string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -38,11 +39,11 @@ namespace RogueLegacy
         {
             var g = e.Graphics;
             g.TranslateTransform(0, Game.ElementSize);
-            g.FillRectangle(Brushes.LightSlateGray, 0, 0, Game.Map.GetLength(1) * Game.ElementSize,
-                Game.Map.GetLength(0) * Game.ElementSize);
-            for (var y = 0; y < Game.Map.GetLength(0); y++)
+            g.FillRectangle(Brushes.LightSlateGray, 0, 0, Game.MapWidth * Game.ElementSize,
+                Game.MapHeight * Game.ElementSize);
+            for (var y = 0; y < Game.MapHeight; y++)
             {
-                for (var x = 0; x < Game.Map.GetLength(1); x++)
+                for (var x = 0; x < Game.MapWidth; x++)
                 {
                     if (Game.Map[y, x] == State.Player || Game.Map[y, x] == State.Enemy)
                     {
@@ -126,9 +127,17 @@ namespace RogueLegacy
                         creature.MakeMove(movement.DeltaPoint);
                 }
 
-                foreach (var creature in Game.Enemies.Where(creature => creature.CanAttack))
-                    creature.Attack();
-                ProgressBar.Value = ProgressBar.Maximum - Game.Enemies.Sum(x => x.HP);
+                try
+                {
+                    foreach (var creature in Game.Enemies.Where(creature => creature.CanAttack))
+                        creature.Attack();
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                progressBar.Value = progressBar.Maximum - Game.Enemies.Where(x => !(x is Skeleton)).Sum(x => x.HP);
                 Invalidate();
             };
             timer.Start();
@@ -138,11 +147,11 @@ namespace RogueLegacy
         {
             Shown += (sender, args) =>
             {
-                Sp = new SoundPlayer(Path.Combine(ProjectPath, @"backsound.wav"));
-                Sp.PlayLooping();
-                IsSoundPlayerRunning = true;
+                sp = new SoundPlayer(Path.Combine(ProjectPath, @"backsound.wav"));
+                sp.PlayLooping();
+                isSoundPlayerRunning = true;
             };
-            Closing += (sender, args) => Sp.Dispose();
+            Closing += (sender, args) => sp.Dispose();
         }
 
         private void InitializeComponents()
@@ -156,13 +165,15 @@ namespace RogueLegacy
 
         private void InitializeProgressBar()
         {
-            ProgressBar = new ProgressBar
+            progressBar = new ProgressBar
             {
                 Location = new Point(0, (Game.Map.GetLength(0) + 1) * Game.ElementSize),
+                Height = Game.ElementSize,
                 Dock = DockStyle.Bottom,
-                Maximum = Game.Enemies.Sum(enemy => enemy.HP)
+                Maximum = Game.Enemies.Sum(enemy => enemy.HP),
+                ForeColor = Color.Red
             };
-            Controls.Add(ProgressBar);
+            Controls.Add(progressBar);
         }
 
         private void InitializeMenuStrip()
@@ -178,17 +189,27 @@ namespace RogueLegacy
                     .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     .First());
             }
+            levelChooser.DropDownItemClicked += (sender, args) =>
+            {
+                timer.Stop();
+                Game.LoadLevel(args.ClickedItem.Text);
+                ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize,
+                    (Game.Map.GetLength(0) + 2) * Game.ElementSize);
+                progressBar.Maximum = Game.Enemies.Sum(x => x.HP);
+                progressBar.Value = 0;
+                timer.Start();
+            };
 
-            menuStrip.Items.Add(levelChooser);
+                menuStrip.Items.Add(levelChooser);
 
             var musicMuter = new ToolStripMenuItem("Вкл/Выкл музыку");
             musicMuter.Click += (sender, args) =>
             {
-                if (IsSoundPlayerRunning)
-                    Sp.Stop();
+                if (isSoundPlayerRunning)
+                    sp.Stop();
                 else
-                    Sp.PlayLooping();
-                IsSoundPlayerRunning = !IsSoundPlayerRunning;
+                    sp.PlayLooping();
+                isSoundPlayerRunning = !isSoundPlayerRunning;
             };
 
             menuStrip.Items.Add(musicMuter);

@@ -104,7 +104,7 @@ namespace RogueLegacy
         {
             var rnd = new Random();
             var newPoint = new Point(-1 + rnd.Next(3), -1 + rnd.Next(3));
-            while (!Game.InBounds(Location + (Size) newPoint) && Game.Map[newPoint.Y, newPoint.X] == State.Empty)
+            while (!Game.InBounds(Location + (Size) newPoint) || Game.Map[Location.Y + newPoint.Y, Location.X + newPoint.X] != State.Empty)
                 newPoint = new Point(-1 + rnd.Next(3), -1 + rnd.Next(3));
             return newPoint;
         }

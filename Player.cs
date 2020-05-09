@@ -71,7 +71,7 @@ namespace RogueLegacy
 
         public string GetName()
         {
-            return "player";
+            return IsBlocking ? "player_blocking" : "player";
         }
 
         public void SwitchBlocking(bool value)

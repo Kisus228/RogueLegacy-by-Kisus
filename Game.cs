@@ -25,8 +25,8 @@ namespace RogueLegacy
         public static Player Player { get; private set; }
         public static List<IMonster> Enemies { get; private set; }
 
-        private static int MapHeight => Map.GetLength(0);
-        private static int MapWidth => Map.GetLength(1);
+        public static int MapHeight => Map.GetLength(0);
+        public static int MapWidth => Map.GetLength(1);
 
         public static bool InBounds(Point p)
         {
@@ -37,6 +37,11 @@ namespace RogueLegacy
         public static void CreateGame(string mapName)
         {
             InitializeCreaturesSprites();
+            LoadLevel(mapName);
+        }
+
+        public static void LoadLevel(string mapName)
+        {
             Enemies = new List<IMonster>();
             Map = InitializeMap(mapName);
             MovementQueue = new Queue<Movement>();
@@ -46,6 +51,7 @@ namespace RogueLegacy
         private static void InitializeCreaturesSprites()
         {
             CreatureToPicture.Add("player", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "player.bmp")));
+            CreatureToPicture.Add("player_blocking", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "player_blocking.bmp")));
             CreatureToPicture.Add("guardian",
                 new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "guardian.bmp")));
             CreatureToPicture.Add("skeleton",
@@ -105,7 +111,8 @@ namespace RogueLegacy
 
         private static IEnumerable<string> GetMapsFromText()
         {
-            return File.ReadAllText(Path.Combine(RogueLegacyWindow.ProjectPath, @"Maps.txt")).Split('|');
+            return File.ReadAllText(Path.Combine(RogueLegacyWindow.ProjectPath, @"Maps.txt"))
+                .Split(new[] {"|\r\n"}, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }
