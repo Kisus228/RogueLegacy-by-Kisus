@@ -35,12 +35,20 @@ namespace RogueLegacy
 
         public static void CreateGame(string mapName)
         {
-            CreatureToPicture.Add("player", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "player.bmp")));
-            CreatureToPicture.Add("guardian", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "guardian.bmp")));
+            InitializeCreaturesSprites();
             Enemies = new List<IMonster>();
             Map = InitializeMap(mapName);
             MovementQueue = new Queue<Movement>();
             UpdateMovements();
+        }
+
+        private static void InitializeCreaturesSprites()
+        {
+            CreatureToPicture.Add("player", new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "player.bmp")));
+            CreatureToPicture.Add("guardian",
+                new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "guardian.bmp")));
+            CreatureToPicture.Add("skeleton",
+                new Bitmap(Path.Combine(RogueLegacyWindow.ProjectPath, "assets", "skeleton.bmp")));
         }
 
         public static void UpdateMovements()
