@@ -6,9 +6,9 @@ namespace RogueLegacy
     {
         public Point Point { get; }
         public DeltaPointsPath PrevPoint { get; }
-        public ICreature Creature { get; }
+        public IMonster Creature { get; }
 
-        public DeltaPointsPath(ICreature creature, Point currentPoint, DeltaPointsPath prevPoint = null)
+        public DeltaPointsPath(IMonster creature, Point currentPoint, DeltaPointsPath prevPoint = null)
         {
             Creature = creature;
             Point = currentPoint;

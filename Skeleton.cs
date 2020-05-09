@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RogueLegacy
 {
-    class Skeleton : IMonster
+    internal class Skeleton : IMonster
     {
         public int HP { get; private set; }
         public int Damage { get; }

@@ -9,7 +9,7 @@ namespace RogueLegacy
         public static IEnumerable<Movement> GetShortestPath(List<IMonster> creatures)
         {
             var queue = new Queue<DeltaPointsPath>();
-            var visited = new Dictionary<ICreature, HashSet<Point>>();
+            var visited = new Dictionary<IMonster, HashSet<Point>>();
             var endPointsList = new DeltaPointsPathList();
             var foundPathCreatures = new HashSet<ICreature>();
             InitializeStartLocation(creatures, queue, visited);
@@ -41,7 +41,7 @@ namespace RogueLegacy
         }
 
         private static void InitializeStartLocation(List<IMonster> creatures, Queue<DeltaPointsPath> queue,
-            Dictionary<ICreature, HashSet<Point>> visited)
+            Dictionary<IMonster, HashSet<Point>> visited)
         {
             foreach (var enemy in creatures)
             {
@@ -50,7 +50,7 @@ namespace RogueLegacy
             }
         }
 
-        private static void AddNewPointsToQueue(Point newPoint, Dictionary<ICreature, HashSet<Point>> visited,
+        private static void AddNewPointsToQueue(Point newPoint, Dictionary<IMonster, HashSet<Point>> visited,
             DeltaPointsPath pointWithPath, Queue<DeltaPointsPath> queue)
         {
             if (!Game.InBounds(newPoint) || Game.Map[newPoint.Y, newPoint.X] != State.Empty) return;

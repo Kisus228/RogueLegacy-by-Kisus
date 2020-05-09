@@ -26,11 +26,11 @@ namespace RogueLegacy
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
         private static readonly string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
-        public static readonly string ProjectPath = Directory.GetParent(ExeFilePath).Parent.Parent.FullName;
+        public static readonly string ProjectPath = GetProjectPath(ExeFilePath);
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
-            ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize, (Game.Map.GetLength(0) + 3) * Game.ElementSize);
+            ClientSize = new Size(Game.MapWidth * Game.ElementSize, (Game.MapHeight + 3) * Game.ElementSize);
             MaximizeBox = false;
             InitializeComponents();
             StartTimer();
@@ -128,19 +128,19 @@ namespace RogueLegacy
                     if (creature.CanMove(movement.DeltaPoint))
                         creature.MakeMove(movement.DeltaPoint);
                 }
-
-                try
-                {
-                    foreach (var creature in Game.Enemies.Where(creature => creature.CanAttack))
+                foreach (var creature in Game.Enemies.Where(creature => creature.CanAttack))
                         creature.Attack();
-                }
-                catch
+                if (Game.QueueToAddEnemy.Count != 0)
                 {
-                    // ignored
+                    foreach (var summonedMonster in Game.QueueToAddEnemy)
+                    {
+                        Game.Enemies.Add(summonedMonster);
+                        Game.Map[summonedMonster.Location.Y, summonedMonster.Location.X] = State.Enemy;
+                    }
                 }
 
-                monsterHpProgressBar.Value = monsterHpProgressBar.Maximum - Game.Enemies.Where(x => !(x is Skeleton)).Sum(x => x.HP);
-                PlayerHpProgressBar.Value = Game.Player.HP;
+                monsterHpProgressBar.Value = Math.Max(monsterHpProgressBar.Maximum - Game.Enemies.Sum(x => x.HP), 0);
+                PlayerHpProgressBar.Value = Math.Max(Game.Player.HP, 0);
             };
             timer.Start();
         }
@@ -246,6 +246,14 @@ namespace RogueLegacy
                 Visible = false
             };
             Controls.Add(pauseLabel);
+        }
+
+        private static string GetProjectPath(string exePath)
+        {
+            var result = exePath;
+            while (Directory.GetParent(result).Name != "RogueLegacy")
+                result = Directory.GetParent(result).FullName;
+            return Directory.GetParent(result).FullName;
         }
     }
 }

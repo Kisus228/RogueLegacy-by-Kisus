@@ -39,6 +39,7 @@ namespace RogueLegacy
         public void MakeMove(Point move)
         {
             SetLookDirectionToPlayer();
+            if (MoveTimer.ElapsedMilliseconds != 0 && MoveTimer.ElapsedMilliseconds < MoveInterval) return;
             MoveTimer.Restart();
             var newLocation = Location + (Size)move;
             Game.Map[Location.Y, Location.X] = State.Empty;
@@ -56,8 +57,7 @@ namespace RogueLegacy
         private void SpawnSkeleton()
         {
             var skeleton = new Skeleton(Location + (Size) GetNewRandomPoint());
-            Game.Map[skeleton.Location.Y, skeleton.Location.X] = State.Enemy;
-            Game.Enemies.Add(skeleton);
+            Game.QueueToAddEnemy.Enqueue(skeleton);
         }
 
         public void GetDamage(int damage)
