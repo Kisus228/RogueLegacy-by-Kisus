@@ -18,15 +18,15 @@ namespace RogueLegacy
     public sealed class RogueLegacyWindow : Form
     {
         private Label pauseLabel;
+        private ProgressBar ProgressBar;
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
         private static readonly string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
-        private Label label1;
         public static readonly string ProjectPath = Directory.GetParent(ExeFilePath).Parent.Parent.FullName;
         public RogueLegacyWindow()
         {
             DoubleBuffered = true;
-            ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize, (Game.Map.GetLength(0) + 1) * Game.ElementSize);
+            ClientSize = new Size(Game.Map.GetLength(1) * Game.ElementSize, (Game.Map.GetLength(0) + 2) * Game.ElementSize);
             MaximizeBox = false;
             InitializeComponents();
             StartTimer();
@@ -127,6 +127,7 @@ namespace RogueLegacy
 
                 foreach (var creature in Game.Enemies.Where(creature => creature.CanAttack))
                     creature.Attack();
+                ProgressBar.Value = ProgressBar.Maximum - Game.Enemies.Sum(x => x.HP);
                 Invalidate();
             };
             timer.Start();
@@ -147,7 +148,19 @@ namespace RogueLegacy
         {
             InitializePauseLabel();
             InitializeMenuStrip();
+            InitializeProgressBar();
             PerformLayout();
+        }
+
+        private void InitializeProgressBar()
+        {
+            ProgressBar = new ProgressBar
+            {
+                Location = new Point(0, (Game.Map.GetLength(0) + 1) * Game.ElementSize),
+                Dock = DockStyle.Bottom,
+                Maximum = Game.Enemies.Sum(enemy => enemy.HP)
+            };
+            Controls.Add(ProgressBar);
         }
 
         private void InitializeMenuStrip()
