@@ -31,7 +31,7 @@ namespace RogueLegacy
             LookDirection = Look.Right;
             AttackInterval = 400;
             MoveTimer = new Stopwatch();
-            MoveInterval = 1000;
+            MoveInterval = 700;
             Range = 3;
         }
         public void MakeMove(Point move)
