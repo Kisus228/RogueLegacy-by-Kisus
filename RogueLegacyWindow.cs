@@ -19,6 +19,8 @@ namespace RogueLegacy
     {
         private Label pauseLabel;
         private ProgressBar ProgressBar;
+        private SoundPlayer Sp;
+        private bool IsSoundPlayerRunning;
         private readonly Timer timer = new Timer{Interval = 15};
         private bool IsPausing { get; set; }
         private static readonly string ExeFilePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -30,7 +32,6 @@ namespace RogueLegacy
             MaximizeBox = false;
             InitializeComponents();
             StartTimer();
-            //InitializeMediaPlayer();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -135,13 +136,13 @@ namespace RogueLegacy
 
         private void InitializeMediaPlayer()
         {
-            SoundPlayer sp = null;
             Shown += (sender, args) =>
             {
-                sp = new SoundPlayer(Path.Combine(ProjectPath, @"backsound.wav"));
-                sp.PlayLooping();
+                Sp = new SoundPlayer(Path.Combine(ProjectPath, @"backsound.wav"));
+                Sp.PlayLooping();
+                IsSoundPlayerRunning = true;
             };
-            Closing += (sender, args) => sp.Dispose();
+            Closing += (sender, args) => Sp.Dispose();
         }
 
         private void InitializeComponents()
@@ -149,6 +150,7 @@ namespace RogueLegacy
             InitializePauseLabel();
             InitializeMenuStrip();
             InitializeProgressBar();
+            InitializeMediaPlayer();
             PerformLayout();
         }
 
@@ -169,15 +171,27 @@ namespace RogueLegacy
                 {Location = Point.Empty, Size = new Size(Game.Map.GetLength(1) * Game.ElementSize, Game.ElementSize)};
             Controls.Add(menuStrip);
             MainMenuStrip = menuStrip;
-            var menuItem = new ToolStripMenuItem("Выбрать уровень");
+            var levelChooser = new ToolStripMenuItem("Выбрать уровень");
             foreach (var level in Game.Levels)
             {
-                menuItem.DropDownItems.Add(level
+                levelChooser.DropDownItems.Add(level
                     .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     .First());
             }
 
-            menuStrip.Items.Add(menuItem);
+            menuStrip.Items.Add(levelChooser);
+
+            var musicMuter = new ToolStripMenuItem("Вкл/Выкл музыку");
+            musicMuter.Click += (sender, args) =>
+            {
+                if (IsSoundPlayerRunning)
+                    Sp.Stop();
+                else
+                    Sp.PlayLooping();
+                IsSoundPlayerRunning = !IsSoundPlayerRunning;
+            };
+
+            menuStrip.Items.Add(musicMuter);
         }
 
         private void InitializePauseLabel()
