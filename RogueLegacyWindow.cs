@@ -149,7 +149,7 @@ namespace RogueLegacy
         {
             Shown += (sender, args) =>
             {
-                sp = new SoundPlayer(Path.Combine(ProjectPath, @"backsound.wav"));
+                sp = new SoundPlayer(Path.Combine(ProjectPath, "files", "backsound.wav"));
                 sp.PlayLooping();
                 isSoundPlayerRunning = true;
             };
@@ -251,9 +251,9 @@ namespace RogueLegacy
         private static string GetProjectPath(string exePath)
         {
             var result = exePath;
-            while (Directory.GetParent(result).Name != "RogueLegacy")
+            while (!File.Exists(Path.Combine(result, "Program.cs")))
                 result = Directory.GetParent(result).FullName;
-            return Directory.GetParent(result).FullName;
+            return result;
         }
     }
 }

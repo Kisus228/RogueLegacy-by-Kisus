@@ -125,7 +125,7 @@ namespace RogueLegacy
 
         private static IEnumerable<string> GetMapsFromText()
         {
-            return File.ReadAllText(Path.Combine(RogueLegacyWindow.ProjectPath, @"Maps.txt"))
+            return File.ReadAllText(Path.Combine(RogueLegacyWindow.ProjectPath, "files", "Maps.txt"))
                 .Split(new[] {"|\r\n"}, StringSplitOptions.RemoveEmptyEntries);
         }
     }
