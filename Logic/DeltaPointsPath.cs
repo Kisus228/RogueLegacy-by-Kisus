@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
+using RogueLegacy.Creatures;
 
-namespace RogueLegacy
+namespace RogueLegacy.Logic
 {
     internal class DeltaPointsPath
     {

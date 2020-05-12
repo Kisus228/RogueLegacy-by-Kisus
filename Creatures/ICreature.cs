@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using RogueLegacy.Logic;
 
-namespace RogueLegacy
+namespace RogueLegacy.Creatures
 {
     public interface ICreature
     {
@@ -19,6 +20,5 @@ namespace RogueLegacy
         void GetDamage(int damage);
         void ChangeAttackInterval(int newValue);
         bool CanMove(Point move);
-        string GetName();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 
-namespace RogueLegacy
+namespace RogueLegacy.Creatures
 {
     public interface IMonster : ICreature
     {

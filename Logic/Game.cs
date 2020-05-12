@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using RogueLegacy.Creatures;
 
-namespace RogueLegacy
+namespace RogueLegacy.Logic
 {
     public static class Game
     {
@@ -32,6 +33,19 @@ namespace RogueLegacy
         public static bool InBounds(Point p)
         {
             return p.X >= 0 && p.X < MapWidth && p.Y >= 0 && p.Y < MapHeight;
+        }
+
+        public static string GetCreatureName(ICreature creature)
+        {
+            switch (creature)
+            {
+                case Player _:
+                    return Game.Player.IsBlocking ? "player_blocking" : "player";
+                case Necromancer _:
+                    return "necromancer";
+                default:
+                    return creature is Skeleton ? "skeleton" : "guardian";
+            }
         }
 
 
@@ -96,7 +110,7 @@ namespace RogueLegacy
             for (var row = 0; row < result.GetLength(0); row++)
             {
                 for (var column = 0; column < result.GetLength(1); column++)
-                    switch (level[row][column])
+                  switch (level[row][column])
                     {
                         case 'G':
                             result[row, column] = State.Enemy;

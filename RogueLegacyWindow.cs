@@ -12,6 +12,8 @@ using System.Media;
 using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Channels;
 using System.Threading;
+using RogueLegacy.Creatures;
+using RogueLegacy.Logic;
 using Timer = System.Windows.Forms.Timer;
 
 namespace RogueLegacy
@@ -51,7 +53,7 @@ namespace RogueLegacy
                         var creature = Game.Player.Location == new Point(x, y)
                             ? Game.Player
                             : (ICreature) Game.Enemies.FirstOrDefault(enemy => enemy.Location == new Point(x, y));
-                        var pic = (Bitmap)Game.CreatureToPicture[creature.GetName()].Clone();
+                        var pic = (Bitmap)Game.CreatureToPicture[Game.GetCreatureName(creature)].Clone();
                         if (creature.LookDirection == Look.Left)
                             pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
                         g.DrawImage(pic, x * Game.ElementSize, y * Game.ElementSize);

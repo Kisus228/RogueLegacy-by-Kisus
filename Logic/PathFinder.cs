@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using RogueLegacy.Creatures;
 
-namespace RogueLegacy
+namespace RogueLegacy.Logic
 {
     public static class PathFinder
     {

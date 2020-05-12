@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RogueLegacy.Logic;
 
-namespace RogueLegacy
+namespace RogueLegacy.Creatures
 {
-    internal class Skeleton : IMonster
+    internal class Necromancer : IMonster
     {
         public int HP { get; private set; }
         public int Damage { get; }
@@ -16,27 +13,34 @@ namespace RogueLegacy
         public Point Location { get; private set; }
         public Stopwatch AttackTimer { get; }
         public bool IsDead { get; private set; }
-        public bool CanAttack => (AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval)
-                                 && CanAttackFromPoint(Location);
+
+        public bool CanAttack =>
+            AttackTimer.ElapsedMilliseconds == 0 || AttackTimer.ElapsedMilliseconds >= AttackInterval;
         public Look LookDirection { get; private set; }
+
+        public Stopwatch MoveTimer { get; }
+        public int MoveInterval { get; }
+        public int Range { get; }
         private int AttackInterval { get; set; }
 
-        public Skeleton(Point startLocation)
+        public Necromancer(Point startLocation)
         {
             AttackTimer = new Stopwatch();
-            HP = 30;
-            Damage = 13;
+            HP = 150;
+            Damage = 0;
             Armor = 0;
             Location = startLocation;
             LookDirection = Look.Right;
-            AttackInterval = 400;
+            AttackInterval = 13000;
             MoveTimer = new Stopwatch();
-            MoveInterval = 700;
-            Range = 2;
+            MoveInterval = 3000;
+            Range = 0;
         }
+
         public void MakeMove(Point move)
         {
             SetLookDirectionToPlayer();
+            if (MoveTimer.ElapsedMilliseconds != 0 && MoveTimer.ElapsedMilliseconds < MoveInterval) return;
             MoveTimer.Restart();
             var newLocation = Location + (Size)move;
             Game.Map[Location.Y, Location.X] = State.Empty;
@@ -48,8 +52,13 @@ namespace RogueLegacy
         {
             SetLookDirectionToPlayer();
             AttackTimer.Restart();
-            if (Game.Player.IsBlocking && Game.Player.LookDirection != LookDirection) return;
-            Game.Player.GetDamage(Damage);
+            SpawnSkeleton();
+        }
+
+        private void SpawnSkeleton()
+        {
+            var skeleton = new Skeleton(Location + (Size) GetNewRandomPoint());
+            Game.QueueToAddEnemy.Enqueue(skeleton);
         }
 
         public void GetDamage(int damage)
@@ -81,18 +90,9 @@ namespace RogueLegacy
                    && Game.InBounds(Location + (Size)move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
         }
 
-        public string GetName()
-        {
-            return "skeleton";
-        }
-
-        public Stopwatch MoveTimer { get; }
-        public int MoveInterval { get; }
-        public int Range { get; }
         public bool CanAttackFromPoint(Point p)
         {
-            return Game.Player.Location.Y == p.Y
-                   && Math.Abs(Game.Player.Location.X - p.X) == 1;
+            return true;
         }
 
         public void SetLookDirectionToPlayer()
@@ -102,6 +102,15 @@ namespace RogueLegacy
                 LookDirection = Look.Right;
             else if (relativeX < 0)
                 LookDirection = Look.Left;
+        }
+
+        public Point GetNewRandomPoint()
+        {
+            var rnd = new Random();
+            var newPoint = new Point(-1 + rnd.Next(3), -1 + rnd.Next(3));
+            while (!Game.InBounds(Location + (Size) newPoint) || Game.Map[Location.Y + newPoint.Y, Location.X + newPoint.X] != State.Empty)
+                newPoint = new Point(-1 + rnd.Next(3), -1 + rnd.Next(3));
+            return newPoint;
         }
     }
 }

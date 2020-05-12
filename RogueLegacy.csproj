@@ -68,25 +68,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeltaPointsPathList.cs" />
-    <Compile Include="Guardian.cs" />
-    <Compile Include="IMonster.cs" />
-    <Compile Include="Look.cs" />
-    <Compile Include="Movement.cs" />
-    <Compile Include="Necromancer.cs" />
-    <Compile Include="PathFinder.cs" />
-    <Compile Include="DeltaPointsPath.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="Game.cs" />
-    <Compile Include="ICreature.cs" />
-    <Compile Include="RogueLegacyTests.cs" />
+    <Compile Include="Logic\DeltaPointsPathList.cs" />
+    <Compile Include="Creatures\Guardian.cs" />
+    <Compile Include="Creatures\IMonster.cs" />
+    <Compile Include="Logic\Look.cs" />
+    <Compile Include="Logic\Movement.cs" />
+    <Compile Include="Creatures\Necromancer.cs" />
+    <Compile Include="Logic\PathFinder.cs" />
+    <Compile Include="Logic\DeltaPointsPath.cs" />
+    <Compile Include="Creatures\Player.cs" />
+    <Compile Include="Logic\Game.cs" />
+    <Compile Include="Creatures\ICreature.cs" />
+    <Compile Include="Tests\RogueLegacyTests.cs" />
     <Compile Include="RogueLegacyWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Skeleton.cs" />
-    <Compile Include="States.cs" />
+    <Compile Include="Creatures\Skeleton.cs" />
+    <Compile Include="Logic\States.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -125,6 +125,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

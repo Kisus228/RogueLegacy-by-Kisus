@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace RogueLegacy
+namespace RogueLegacy.Logic
 {
     internal class DeltaPointsPathList : IEnumerable<Movement>
     {

@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using RogueLegacy.Logic;
 
-namespace RogueLegacy
+namespace RogueLegacy.Creatures
 {
     public class Player : ICreature
     {
@@ -75,11 +76,6 @@ namespace RogueLegacy
         {
             var newLocation = Location + (Size) move;
             return Game.InBounds(Location + (Size) move) && Game.Map[newLocation.Y, newLocation.X] == State.Empty;
-        }
-
-        public string GetName()
-        {
-            return IsBlocking ? "player_blocking" : "player";
         }
 
         public void SwitchBlocking(bool value)
